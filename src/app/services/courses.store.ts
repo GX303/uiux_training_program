@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { Course,sortCoursesBySeqNo } from '../model/course';
-import { catchError, map, tap,shareReplay } from "rxjs/operators";
+import { Course, sortCoursesBySeqNo } from '../model/course';
+import { catchError, map, tap, shareReplay } from "rxjs/operators";
 import { LoadingService } from '../loading/loading.service';
 import { HttpClient } from '@angular/common/http';
 import { MessagesService } from '../messages/messages.service';
@@ -9,17 +9,17 @@ import { MessagesService } from '../messages/messages.service';
 @Injectable({
     providedIn: 'root'
 })
-export class CoursesStore{
+export class CoursesStore {
     private subject = new BehaviorSubject<Course[]>([]);
     courses$: Observable<Course[]> = this.subject.asObservable();
 
-    constructor(private http:HttpClient, 
+    constructor(private http: HttpClient,
         private loading: LoadingService,
-        private messages: MessagesService){
+        private messages: MessagesService) {
         this.loadAllCourses();
     }
 
-    private loadAllCourses(){
+    private loadAllCourses() {
         const loadedCourses$ = this.http.get<Course[]>('/api/courses').pipe(
             map(response => response["payload"]),
             catchError(err => {
@@ -37,7 +37,7 @@ export class CoursesStore{
     saveCourse(courseId: string, changes: Partial<Course>): Observable<any> {
         const courses = this.subject.getValue();
         const index = courses.findIndex(course => course.id == courseId);
-        const newCourse : Course = {
+        const newCourse: Course = {
             ...courses[index],
             ...changes
         };
@@ -49,6 +49,7 @@ export class CoursesStore{
 
         return this.http.put(`api/courses/${courseId}`, changes).pipe(
             catchError(err => {
+                this.subject.next(courses);
                 const message = "Could not save course";
                 console.log(message, err);
                 this.messages.showErrors(message);
@@ -57,7 +58,7 @@ export class CoursesStore{
             shareReplay());
     }
 
-    filterByCategory(category: string): Observable<Course[]>{
+    filterByCategory(category: string): Observable<Course[]> {
         return this.courses$.pipe(
             map(courses => courses.filter(
                 course => course.category == category
