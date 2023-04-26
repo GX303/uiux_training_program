@@ -1,5 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import { LoadingService } from './loading/loading.service';
+import { MessagesService } from './messages/messages.service';
+import { AuthStore } from './services/auth.store';
 
 
 @Component({
@@ -7,19 +9,19 @@ import {Component, OnInit} from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements  OnInit {
+export class AppComponent implements OnInit {
 
-    constructor() {
+  constructor(public auth: AuthStore) {
 
-    }
+  }
 
-    ngOnInit() {
+  ngOnInit() {
 
 
-    }
+  }
 
   logout() {
-
+    this.auth.logout();
   }
 
 }
